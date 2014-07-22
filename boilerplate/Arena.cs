@@ -43,8 +43,8 @@ namespace CodeFights.boilerplate
 		
 		    while(f1Lifepoints > 0 && f2Lifepoints > 0)
             {
-			    Move move1 = fighter1.MakeNextMove(f1Move, score1, score2);
-			    Move move2 = fighter2.MakeNextMove(f2Move, score2, score1);
+			    Move move1 = fighter1.MakeNextMove(f2Move, score1, score2);
+			    Move move2 = fighter2.MakeNextMove(f1Move, score2, score1);
 			
 			    score1 = GameScoringRules.CalculateScore(move1.Attacks, move2.Defences);
 			    score2 = GameScoringRules.CalculateScore(move2.Attacks, move1.Defences);
