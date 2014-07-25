@@ -44,7 +44,12 @@ namespace CodeFights.boilerplate
 		    while(f1Lifepoints > 0 && f2Lifepoints > 0)
             {
 			    Move move1 = fighter1.MakeNextMove(f2Move, score1, score2);
+			    if (GameScoringRules.IsMoveLegal(move1)==false)
+				throw new ArgumentException(f1name+" made an illegal move: "+move1);
+
 			    Move move2 = fighter2.MakeNextMove(f1Move, score2, score1);
+			    if (GameScoringRules.IsMoveLegal(move2)==false)
+				throw new ArgumentException(f2name+" made an illegal move: "+move2);
 			
 			    score1 = GameScoringRules.CalculateScore(move1.Attacks, move2.Defences);
 			    score2 = GameScoringRules.CalculateScore(move2.Attacks, move1.Defences);
