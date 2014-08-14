@@ -22,5 +22,10 @@
             return rez;
         }
 
+	public static bool IsMoveLegal(Move move) {
+		return ( move.Attacks.Count + move.Defences.Count <= 3 );
+	}
+
+
     }
 }
