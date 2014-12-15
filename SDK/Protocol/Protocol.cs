@@ -1,6 +1,7 @@
 ﻿namespace CodeFights.SDK.Protocol
 {
     using System;
+    using System.Text;
 
     public static class Protocol
     {
@@ -47,6 +48,33 @@
             }
 
             return fighterMove;
+        }
+
+        public static string SerializeMove(IFighterMove fighterMove)
+        {
+            if (fighterMove == null)
+            {
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder();
+
+            foreach (Area attackedArea in fighterMove.AttackedAreas)
+            {
+                sb.Append("a" + attackedArea.ToString()[0]);
+            }
+
+            foreach (Area blockedArea in fighterMove.BlockedAreas)
+            {
+                sb.Append("b" + blockedArea.ToString()[0]);
+            }
+
+            if (fighterMove.Comment != null && fighterMove.Comment.Trim() != string.Empty)
+            {
+                sb.Append("c" + fighterMove.Comment.Trim());
+            }
+
+            return sb.ToString().ToLowerInvariant();
         }
 
         private static Area GetArea(string line, int index)
