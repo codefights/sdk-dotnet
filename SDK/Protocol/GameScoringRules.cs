@@ -9,9 +9,9 @@
 
         public static int CalculateScore(IList<Area> attackAreas, IList<Area> blockAreas)
         {
-			return (attackAreas == null) 
-				? 0
-				: attackAreas.Where(attackedArea => !blockAreas.Contains(attackedArea)).Sum(area => (int)area);
+            return (attackAreas == null)
+                ? 0
+                : attackAreas.Where(attackedArea => !blockAreas.Contains(attackedArea)).Sum(area => (int)area);
         }
 
         public static bool IsInvalidMove(IFighterMove fighterMove)

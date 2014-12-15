@@ -4,7 +4,7 @@
 
     using CodeFights.SDK.Protocol;
 
-	public class ServerModeRunner : IFighterRunner
+    public class ServerModeRunner : IFighterRunner
     {
         private readonly TextReader _inStream;
 

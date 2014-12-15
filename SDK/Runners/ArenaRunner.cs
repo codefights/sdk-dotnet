@@ -30,7 +30,7 @@
 
         public void Run(IFighter fighter)
         {
-			ArrangeFight(fighter, _args);
+            ArrangeFight(fighter, _args);
             StartFight();
         }
 
@@ -84,37 +84,37 @@
             _arenaCommentator.GameOver(lifePointsFighter1, lifePointsFighter2);
         }
 
-		private void ArrangeFight(IFighter fighter, string[] args)
+        private void ArrangeFight(IFighter fighter, string[] args)
         {
-			_fighter1 = fighter;
-			_nameFighter1 = "Your bot";
-			_nameFighter2 = _args[1];
+            _fighter1 = fighter;
+            _nameFighter1 = "Your bot";
+            _nameFighter2 = _args[1];
 
             if ("boxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
-				_fighter2 = new Boxer();
+                _fighter2 = new Boxer();
             }
 
             if ("kickboxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
-				_fighter2 = new Kickboxer();
+                _fighter2 = new Kickboxer();
             }
 
             if ("human".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
-				_fighter2 = new Human();
+                _fighter2 = new Human();
             }
 
             if ("remote".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
-				_fighter2 = _fighter1 = new RemoteFighterDecorator(fighter, args);
-				_nameFighter2 = "Opponent bot";
+                _fighter2 = _fighter1 = new RemoteFighterDecorator(fighter, args);
+                _nameFighter2 = "Opponent bot";
             }
 
-			if (_fighter2 == null)
-			{
-				throw new NotSupportedException("unrecognized built-in bot: " + args[1]);
-			}
+            if (_fighter2 == null)
+            {
+                throw new NotSupportedException("unrecognized built-in bot: " + args[1]);
+            }
         }
     }
 }

@@ -71,7 +71,7 @@
             return result;
         }
 
-		public struct ServerResponseResult
+        public struct ServerResponseResult
         {
             public IFighterMove FighterMove;
 
