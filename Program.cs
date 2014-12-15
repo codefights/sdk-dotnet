@@ -54,10 +54,12 @@
 
         private static void PrintUsageInstructions(string[] args)
         {
-            const string UsageInstructions = FightHumanSwitch + "\t\truns your bot against you in interactive mode\n" +
-                                             FightBotSwitch + " boxer\truns your bot against a built-in boxer bot\n" +
-                                             FightBotSwitch + " kickboxer\truns your bot against a built-in kickboxer bot\n" +
-                                             RunOnServerSwitch + "\truns your bot in codefights engine environment";
+            const string UsageInstructions = FightHumanSwitch + "\t\t\truns your bot against you in interactive mode\n" +
+                                             FightBotSwitch + " boxer\t\truns your bot against a built-in boxer bot\n" +
+                                             FightBotSwitch + " kickboxer\t\truns your bot against a built-in kickboxer bot\n" +
+                                             FightBotSwitch + " remote -l <port> \truns your bot against remote opponent in server mode\n" +
+                                             FightBotSwitch + " remote <ip> <port> \tconnects to remote opponent bot\n" +
+                                             RunOnServerSwitch + "\t\truns your bot on codefights.net server";
 
             if (args.Length > 0)
             {
