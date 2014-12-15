@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CodeFights.model;
-
-namespace CodeFights
+﻿namespace CodeFights
 {
-    class MyFighter : IFighter
+	using CodeFights.SDK.Protocol;
+
+    public class MyFighter : IFighter
     {
-        public Move MakeNextMove(Move opponentsLastMove, int myLastScore, int opponentsLastScore)
+		public IFighterMove MakeNextMove(IFighterMove opponentsLastMove, int myLastScore, int opponentsLastScore)
         {
-            return new Move().AddAttack(Area.Nose).SetComment("your impl goes here");
+			return new FighterMove().Attack(Area.Nose)
+								    .Attack(Area.Jaw)
+									.Block(Area.Jaw);
         }
     }
 }
