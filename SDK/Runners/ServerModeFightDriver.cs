@@ -2,7 +2,6 @@
 {
     using System;
     using System.IO;
-    using System.Text;
 
     using CodeFights.SDK.Protocol;
 
@@ -25,34 +24,12 @@
 
         public void SendRequest(IFighterMove fighterMove)
         {
-            _outStream.WriteLine(Protocol.RequesHeaderCode + SerializeMove(fighterMove));
+            _outStream.WriteLine(Protocol.RequesHeaderCode + Protocol.SerializeMove(fighterMove));
         }
 
         public ServerResponseResult ReadResponse()
         {
             return ParseResponse(_inStream.ReadLine());
-        }
-
-        private static string SerializeMove(IFighterMove fighterMove)
-        {
-            var sb = new StringBuilder();
-
-            foreach (Area attackedArea in fighterMove.AttackedAreas)
-            {
-                sb.Append("a" + attackedArea.ToString()[0]);
-            }
-
-            foreach (Area blockedArea in fighterMove.BlockedAreas)
-            {
-                sb.Append("b" + blockedArea.ToString()[0]);
-            }
-
-            if (fighterMove.Comment != null && fighterMove.Comment.Trim() != string.Empty)
-            {
-                sb.Append("c" + fighterMove.Comment.Trim());
-            }
-
-            return sb.ToString().ToLowerInvariant();
         }
 
         private static ServerResponseResult ParseResponse(string line)
@@ -87,14 +64,14 @@
                 }
                 else
                 {
-                    throw new ArgumentException("invalid keyword " + firstKeyword + ". Syntax is [YOUR-SCORE area] [OPPONENT-SCORE area] [ENEMY-MOVE move]");
+                    throw new ArgumentException("Invalid keyword " + firstKeyword + ". Syntax is [YOUR-SCORE area] [OPPONENT-SCORE area] [ENEMY-MOVE move]");
                 }
             }
 
             return result;
         }
 
-        public class ServerResponseResult
+		public struct ServerResponseResult
         {
             public IFighterMove FighterMove;
 
