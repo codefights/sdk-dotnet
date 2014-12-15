@@ -1,27 +1,34 @@
-﻿using System;
-using System.IO;
-using CodeFights.model;
-
-namespace CodeFights.boilerplate.server
+﻿namespace CodeFights.SDK.Runners
 {
-    class ServerMode
-    {
-	    private TextReader inStream = Console.In;
-	    private TextWriter outStream = Console.Out;
+    using System.IO;
 
-	    public void Run(IFighter fighter)
+    using CodeFights.SDK.Protocol;
+
+	public class ServerModeRunner : IFighterRunner
+    {
+        private readonly TextReader _inStream;
+
+        private readonly TextWriter _outStream;
+
+        public ServerModeRunner(TextReader inStream, TextWriter outStream)
         {
-		    Protocol protocol = new Protocol(inStream, outStream);
-		    protocol.Handshake();
-		
-		    Protocol.ServerResponse resp = new Protocol.ServerResponse();
-		
-		    while(true)
+            _inStream = inStream;
+            _outStream = outStream;
+        }
+
+        public void Run(IFighter fighter)
+        {
+            var serverModeFightDriver = new ServerModeFightDriver(_inStream, _outStream);
+            serverModeFightDriver.SendHandshake();
+
+            var resp = new ServerModeFightDriver.ServerResponseResult();
+
+            while (true)
             {
-			    Move move = fighter.MakeNextMove(resp.move, resp.score1, resp.score2);
-			    protocol.SendRequest(move);
-			    resp = protocol.ReadResponse();
-		    }	
-	    }	
+                var fighterMove = fighter.MakeNextMove(resp.FighterMove, resp.Score1, resp.Score2);
+                serverModeFightDriver.SendRequest(fighterMove);
+                resp = serverModeFightDriver.ReadResponse();
+            }
+        }
     }
 }

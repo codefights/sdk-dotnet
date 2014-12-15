@@ -1,47 +1,55 @@
-﻿using CodeFights.model;
-using System;
-
-namespace CodeFights.samples
+﻿namespace CodeFights.SDK.SampleFighters
 {
-    class Boxer: IFighter
+    using System;
+
+    using CodeFights.SDK.Protocol;
+
+    internal class Boxer : IFighter
     {
-        private Area attack1=Area.Nose;
-        private Area attack2=Area.Jaw;
-        private Area defence=Area.Nose;
-    
-        private int myScoreTotal = 0;
-        private int opponentScoreTotal = 0;    
-	
-	    public Move MakeNextMove(Move opponentLastMove, int myLastScore, int oppLastScore) 
-        {
-		    myScoreTotal += myLastScore;
-		    opponentScoreTotal += oppLastScore;
+        private static readonly Random _random = new Random();
 
-		    Move move= new Move()
-						    .AddAttack(attack1)
-						    .AddAttack(attack2);
-	
-		    if (opponentLastMove != null)
-	            if (opponentLastMove.Attacks.Contains(defence) == false)
-	                defence = changeDefence(defence); 
-		
-            if (myScoreTotal>=opponentScoreTotal)
-        	    move.AddAttack(createRandomAttack()); // 3 attacks, 0 defence
+        private Area _defenceArea = Area.Nose;
+
+        private int _myScoreTotal;
+
+        private int _opponentScoreTotal;
+
+        public IFighterMove MakeNextMove(IFighterMove opponentsLastMove, int myLastScore, int opponentsLastScore)
+        {
+            _myScoreTotal += myLastScore;
+            _opponentScoreTotal += opponentsLastScore;
+
+            FighterMove fighterMove = new FighterMove().Attack(Area.Nose)
+                                                       .Attack(Area.Jaw);
+
+            if (opponentsLastMove != null)
+            {
+                if (opponentsLastMove.AttackedAreas.Contains(_defenceArea) == false)
+                {
+                    _defenceArea = ChangeDefence(_defenceArea);
+                }
+            }
+
+            if (_myScoreTotal >= _opponentScoreTotal)
+            {
+                fighterMove.Attack(GetRandomArea()); // 3 attacks, 0 defence
+            }
             else
-                move.AddDefence(defence);			  // 2 attacks, 1 defence
-				
-		    return move;
-	    }
+            {
+                fighterMove.Block(_defenceArea); // 2 attacks, 1 defence
+            }
 
-        private Area changeDefence(Area oldDefence) 
-        {
-            return (oldDefence==Area.Nose) ? Area.Jaw : Area.Nose;
+            return fighterMove;
         }
 
-        private Area createRandomAttack() 
+        private static Area ChangeDefence(Area oldDefence)
         {
-            return new Random().NextDouble() > 0.5d ? Area.Belly : Area.Jaw;
+            return (oldDefence == Area.Nose) ? Area.Jaw : Area.Nose;
         }
 
+        private static Area GetRandomArea()
+        {
+            return _random.NextDouble() > 0.5d ? Area.Belly : Area.Jaw;
+        }
     }
 }

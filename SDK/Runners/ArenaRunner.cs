@@ -1,76 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using CodeFights.model;
-
-using System.Linq;
-
-namespace CodeFights.boilerplate
+﻿namespace CodeFights.SDK.Runners
 {
-    class Arena
+    using System;
+    using System.IO;
+
+    using CodeFights.SDK.Protocol;
+    using CodeFights.SDK.SampleFighters;
+
+    public class ArenaRunner : IFighterRunner
     {
-        private Dictionary<string, IFighter> fighters = new Dictionary<string, IFighter>();
-	
-	    private Commentator commentator = new Commentator();
-	
-	    public Arena RegisterFighter(IFighter fighter, string name)
-        {
-		    fighters.Add(name, fighter);
-		    return this;
-	    }
-	
-	    public void StageFight() 
-        {
-		    if (fighters.Count != 2)
-			    throw new ArgumentException("Must be 2 fighters!"); 
-		
-            string f1name = fighters.Keys.FirstOrDefault();
-		    IFighter fighter1 = fighters[f1name];
-            fighters.Remove(f1name);
+        private readonly string[] _args;
 
-		    string f2name = fighters.Keys.FirstOrDefault();
-		    IFighter fighter2 = fighters[f2name];
-            fighters.Remove(f2name);
-		
-		    commentator.SetFighterNames(f1name, f2name);
-		
-		    Move f1Move = null;
-		    Move f2Move = null;
-		
-		    int score1=0;
-		    int score2=0;
-		
-		    int f1Lifepoints, f2Lifepoints=f1Lifepoints=GameScoringRules.LIFEPOINTS;
-		
-		    while(f1Lifepoints > 0 && f2Lifepoints > 0)
-            {
-			    Move move1 = fighter1.MakeNextMove(f2Move, score1, score2);
-			    if (GameScoringRules.IsMoveLegal(move1)==false)
-				throw new ArgumentException(f1name+" made an illegal move: "+move1);
+        private readonly TextWriter _outStream;
 
-			    Move move2 = fighter2.MakeNextMove(f1Move, score2, score1);
-			    if (GameScoringRules.IsMoveLegal(move2)==false)
-				throw new ArgumentException(f2name+" made an illegal move: "+move2);
-			
-			    score1 = GameScoringRules.CalculateScore(move1.Attacks, move2.Defences);
-			    score2 = GameScoringRules.CalculateScore(move2.Attacks, move1.Defences);
-		
-			    commentator.DescribeRound(move1, move2, score1, score2);
-			
-			    f1Lifepoints -=score2;
-			    f2Lifepoints -=score1;
-			
-			    f1Move = move1;
-			    f2Move = move2;
-		    }
-		
-		    commentator.GameOver(f1Lifepoints, f2Lifepoints);
-	    }
+        private IFighter _fighter1;
 
-        public Arena SetCommentator(Commentator c)
+        private IFighter _fighter2;
+
+        private string _nameFighter1;
+
+        private string _nameFighter2;
+
+        private ArenaCommentator _arenaCommentator;
+
+        public ArenaRunner(string[] args, TextWriter outStream)
         {
-            this.commentator = c;
-            return this;
+            _args = args;
+            _outStream = outStream;
         }
 
+        public void Run(IFighter fighter)
+        {
+            _fighter1 = fighter;
+            _nameFighter1 = "Your bot";
+
+            _fighter2 = CreateBot(_args);
+            _nameFighter2 = _args[1];
+
+            StageFight();
+        }
+
+        private void StageFight()
+        {
+            if (_fighter1 == null || _fighter2 == null)
+            {
+                throw new ArgumentException("Must be 2 fighters!");
+            }
+
+            _arenaCommentator = new ArenaCommentator(_outStream);
+            _arenaCommentator.SetFighterNames(_nameFighter1, _nameFighter2);
+
+            IFighterMove lastMoveFighter1 = null;
+            IFighterMove lastMoveFighter2 = null;
+
+            int lastScoreFighter1 = 0;
+            int lastScoreFighter2 = 0;
+
+            int lifePointsFighter1 = GameScoringRules.LifePointsPerFight;
+            int lifePointsFighter2 = GameScoringRules.LifePointsPerFight;
+
+            while (lifePointsFighter1 > 0 && lifePointsFighter2 > 0)
+            {
+                var moveFighter1 = _fighter1.MakeNextMove(lastMoveFighter2, lastScoreFighter1, lastScoreFighter2);
+
+                if (GameScoringRules.IsInvalidMove(moveFighter1))
+                {
+                    throw new ArgumentException(_nameFighter1 + " made an illegal move: " + moveFighter1);
+                }
+
+                var moveFighter2 = _fighter2.MakeNextMove(lastMoveFighter1, lastScoreFighter2, lastScoreFighter1);
+
+                if (GameScoringRules.IsInvalidMove(moveFighter2))
+                {
+                    throw new ArgumentException(_nameFighter2 + " made an illegal move: " + moveFighter2);
+                }
+
+                lastScoreFighter1 = GameScoringRules.CalculateScore(moveFighter1.AttackedAreas, moveFighter2.BlockedAreas);
+                lastScoreFighter2 = GameScoringRules.CalculateScore(moveFighter2.AttackedAreas, moveFighter1.BlockedAreas);
+
+                _arenaCommentator.DescribeRound(moveFighter1, moveFighter2, lastScoreFighter1, lastScoreFighter2);
+
+                lifePointsFighter1 -= lastScoreFighter2;
+                lifePointsFighter2 -= lastScoreFighter1;
+
+                lastMoveFighter1 = moveFighter1;
+                lastMoveFighter2 = moveFighter2;
+            }
+
+            _arenaCommentator.GameOver(lifePointsFighter1, lifePointsFighter2);
+        }
+
+        private static IFighter CreateBot(string[] args)
+        {
+            if ("boxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new Boxer();
+            }
+
+            if ("kickboxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new Kickboxer();
+            }
+
+            if ("human".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new Human();
+            }
+
+            throw new NotSupportedException("unrecognized built-in bot: " + args[1]);
+        }
     }
 }

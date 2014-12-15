@@ -1,65 +1,70 @@
-﻿namespace CodeFights.model
+﻿namespace CodeFights.SDK.Protocol
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
-    internal class Move
+    public class FighterMove : IFighterMove
     {
-        private readonly List<Area> attacks = new List<Area>();
+        private readonly List<Area> _attackedAreas = new List<Area>();
 
-        private readonly List<Area> defences = new List<Area>();
+        private readonly List<Area> _blockedAreas = new List<Area>();
 
-        public IList<Area> Attacks
+        public IList<Area> AttackedAreas
         {
             get
             {
-                return this.attacks;
+                return _attackedAreas;
             }
         }
 
-        public IList<Area> Defences
+        public IList<Area> BlockedAreas
         {
             get
             {
-                return this.defences;
+                return _blockedAreas;
             }
         }
 
         public string Comment { get; set; }
 
-        public Move AddAttack(Area area)
+        public FighterMove Attack(Area area)
         {
-            this.attacks.Add(area);
+            _attackedAreas.Add(area);
             return this;
         }
 
-        public Move AddDefence(Area area)
+        public FighterMove Block(Area area)
         {
-            this.defences.Add(area);
+            _blockedAreas.Add(area);
             return this;
         }
 
-        public Move SetComment(string comment)
+        public FighterMove SetComment(string comment)
         {
-            this.Comment = comment;
+            Comment = comment;
             return this;
         }
 
         public override string ToString()
         {
-            StringBuilder rez = new StringBuilder("Move ");
+            var sb = new StringBuilder("Move ");
 
-            foreach (Area attack in attacks)
-                rez.Append(" ATTACK " + attack);
+            foreach (var attackedArea in AttackedAreas)
+            {
+                sb.Append(" ATTACK " + attackedArea);
+            }
 
-            foreach (Area defence in defences)
-                rez.Append(" BLOCK " + defence);
+            foreach (var blockedArea in BlockedAreas)
+            {
+                sb.Append(" BLOCK " + blockedArea);
+            }
 
-            if (!string.IsNullOrWhiteSpace(Comment))
-                rez.Append(" COMMENT " + Comment);
+            if (!string.IsNullOrWhiteSpace(this.Comment))
+            {
+                sb.Append(" COMMENT " + this.Comment);
+            }
 
-            return rez.ToString();
+            return sb.ToString();
         }
     }
 }

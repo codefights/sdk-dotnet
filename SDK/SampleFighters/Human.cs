@@ -1,56 +1,59 @@
-﻿using System;
-using CodeFights.model;
-using System.IO;
-using CodeFights.boilerplate.server;
-
-namespace CodeFights.boilerplate
+﻿namespace CodeFights.SDK.SampleFighters
 {
-    class Human: IFighter
+    using System;
+
+    using CodeFights.SDK.Protocol;
+
+    internal class Human : IFighter
     {
-	    private TextWriter consoleOut = Console.Out;
-	    private TextReader consoleIn = Console.In;
-		
-	    public Move MakeNextMove(Move oppMove, int iScored, int oppScored)
+        public IFighterMove MakeNextMove(IFighterMove opponentsLastMove, int myLastScore, int opponentsLastScore)
         {
-		    PrintInstructions();
-		
-		    while (true)
+            PrintInstructions();
+
+            while (true)
+            {
                 try
                 {
-                    Move move = ParseInput(consoleIn.ReadLine().Trim());
-                    return move;
+                    var input = Console.ReadLine() ?? string.Empty;
+                    var fighterMove = ParseInput(input.Trim().Replace(" ", string.Empty));
+                    return fighterMove;
                 }
-                catch (ArgumentException ipe)
+                catch (ArgumentException ex)
                 {
-                    Console.Error.WriteLine("Human error: " + ipe.Message);
+                    Console.Error.WriteLine("Human error: " + ex.Message);
                 }
-                catch (OperationCanceledException oce)
+                catch (OperationCanceledException)
                 {
                     Console.Error.WriteLine("Bye");
                     Environment.Exit(0);
                 }
-	    }
+            }
+        }
 
-	    private void PrintInstructions() 
+        private static void PrintInstructions()
         {
-		    consoleOut.WriteLine("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)eggs");
-		    consoleOut.WriteLine("  (for example, BN BJ AN)");
-		    consoleOut.Write(": ");
-	    }
-	
-	    private Move ParseInput(string input) 
+            Console.WriteLine("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)eggs");
+            Console.WriteLine("  (for example, BN BJ AN)");
+            Console.Write(": ");
+        }
+
+        private static IFighterMove ParseInput(string input)
         {
-		    input=input.Replace("\\W", "").ToLowerInvariant();
+            input = input.Replace("\\W", string.Empty).ToLowerInvariant();
 
             if (input.StartsWith("q"))
+            {
                 throw new OperationCanceledException("Exiting");
-	 
-		    Move move = Protocol.ParseMove(input);
-		    if (move.Attacks.Count + move.Defences.Count > 3)
-			    throw new ArgumentException("Can make max 3 things at a time!");
-		
-		    return move;
-	    }
+            }
 
+            var fighterMove = Protocol.ParseMove(input);
+
+            if (fighterMove.AttackedAreas.Count + fighterMove.BlockedAreas.Count > 3)
+            {
+                throw new ArgumentException("Can make max 3 things at a time!");
+            }
+
+            return fighterMove;
+        }
     }
 }

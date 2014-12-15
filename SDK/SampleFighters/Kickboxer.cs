@@ -1,45 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CodeFights.model;
-
-namespace CodeFights.samples
+﻿namespace CodeFights.SDK.SampleFighters
 {
-    class Kickboxer: IFighter
+    using System;
+
+    using CodeFights.SDK.Protocol;
+
+    internal class Kickboxer : IFighter
     {
-        private Area attack1 = Area.Jaw;
-        private Area attack2 = Area.Nose;
-        private Area defence = Area.Nose;
-    
-	    public Move MakeNextMove(Move opponentLastMove, int myLastScore, int oppLastScore) 
+        private static readonly Random _random = new Random();
+
+        private Area _attackArea1 = Area.Jaw;
+
+        private Area _attackArea2 = Area.Nose;
+
+        public IFighterMove MakeNextMove(IFighterMove opponentsLastMove, int myLastScore, int opponentsLastScore)
         {
-		    if (opponentLastMove != null)
-	            if (opponentLastMove.Defences.Contains(this.attack1))
-	                this.attack1 = CreateRandomArea();
-        
-            this.attack2 = CreateRandomArea();
-        
-            return new Move()
-                        .AddAttack(attack1)
-                        .AddAttack(attack2)
-                        .AddDefence(defence);
+            if (opponentsLastMove != null && opponentsLastMove.BlockedAreas.Contains(_attackArea1))
+            {
+                _attackArea1 = GetRandomArea();
+            }
+
+            _attackArea2 = GetRandomArea();
+
+            return new FighterMove().Attack(_attackArea1)
+                                    .Attack(_attackArea2)
+                                    .Block(Area.Nose);
         }
 
-        private Area CreateRandomArea() 
+        private Area GetRandomArea()
         {
-            double random = new Random().NextDouble();
-            if (random<0.3)
+            double random = _random.NextDouble();
+
+            if (random < 0.3)
+            {
                 return Area.Nose;
+            }
 
-            if (random<0.7)
+            if (random < 0.7)
+            {
                 return Area.Jaw;
+            }
 
-            if (random<0.9)
-                return Area.Groin; // oh yeah
+            if (random < 0.9)
+            {
+                return Area.Groin;
+            }
 
             return Area.Belly;
-        }	
-
+        }
     }
 }

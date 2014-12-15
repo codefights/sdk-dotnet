@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CodeFights.model
+﻿namespace CodeFights.SDK.Protocol
 {
-    interface IFighter
+    public interface IFighter
     {
-        Move MakeNextMove(Move opponentsLastMove, int myLastScore, int opponentsLastScore);
+        IFighterMove MakeNextMove(IFighterMove opponentsLastMove, int myLastScore, int opponentsLastScore);
     }
 }

@@ -1,89 +1,102 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CodeFights.model;
-using System.IO;
-
-namespace CodeFights.boilerplate
+﻿namespace CodeFights.SDK.Runners
 {
-    class Commentator
+    using System.IO;
+    using System.Text;
+
+    using CodeFights.SDK.Protocol;
+
+    public class ArenaCommentator
     {
+        private readonly TextWriter _outStream;
 
-        private string fighter1 = "Fighter1";
-        private string fighter2 = "Fighter2";
+        private string _nameFighter1 = "Fighter1";
 
-        private TextWriter outStream = Console.Out;
+        private string _nameFighter2 = "Fighter2";
 
-        private int lp1 = GameScoringRules.LIFEPOINTS;
-        private int lp2 = GameScoringRules.LIFEPOINTS;
+        private int _lifePointsFighter1 = GameScoringRules.LifePointsPerFight;
 
-        public void SetFighterNames(string fighter1name, string fighter2name)
+        private int _lifePointsFighter2 = GameScoringRules.LifePointsPerFight;
+
+        public ArenaCommentator(TextWriter outStream)
         {
-            fighter1 = fighter1name;
-            fighter2 = fighter2name;
+            _outStream = outStream;
         }
 
-        public void DescribeRound(Move move1, Move move2, int score1, int score2)
+        public void SetFighterNames(string nameFighter1, string nameFighter2)
         {
-            DescribeMove(fighter1, move1, score1, move2);
-            DescribeMove(fighter2, move2, score2, move1);
-
-            lp1 -= score2;
-            lp2 -= score1;
-
-            outStream.WriteLine(fighter1 + " vs " + fighter2 + ": " + lp1 + " to " + lp2);
-            outStream.WriteLine();
+            _nameFighter1 = nameFighter1;
+            _nameFighter2 = nameFighter2;
         }
 
-
-        public void GameOver(int f1Lifepoints, int f2Lifepoints)
+        public void DescribeRound(IFighterMove move1, IFighterMove move2, int score1, int score2)
         {
-            outStream.WriteLine("FIGHT OVER");
-            if (f1Lifepoints > f2Lifepoints)
-                outStream.WriteLine("THE WINNER IS " + fighter1);
-            else
-            if (f2Lifepoints > f1Lifepoints)
-                outStream.WriteLine("THE WINNER IS " + fighter2);
-            else
-                outStream.WriteLine("IT'S A DRAW!!!");
+            DescribeMove(_nameFighter1, move1, score1, move2);
+            DescribeMove(_nameFighter2, move2, score2, move1);
+
+            _lifePointsFighter1 -= score2;
+            _lifePointsFighter2 -= score1;
+
+            _outStream.WriteLine(this._nameFighter1 + " vs " + this._nameFighter2 + ": " + this._lifePointsFighter1 + " to " + this._lifePointsFighter2);
+            _outStream.WriteLine();
         }
 
-        private void DescribeMove(string fighterName, Move move, int score, Move counterMove)
+        public void GameOver(int lifePointsFighter1, int lifePointsFighter2)
         {
-            outStream.WriteLine(fighterName
-                                    + DescribeAttacks(move, counterMove, score)
-                                    + DescribeDefences(move));
-        }
+            _outStream.WriteLine("FIGHT OVER");
 
-        private static string DescribeAttacks(Move move, Move counterMove, int score)
-        {
-            if (move.Attacks.Count <= 0)
-                return " did NOT attack at all ";
-
-            string rez = " attacked ";
-            foreach (Area attack in move.Attacks)
+            if (lifePointsFighter1 > lifePointsFighter2)
             {
-                rez += attack;
-                if (counterMove.Defences.Contains(attack))
-                    rez += "(-), ";
-                else
-                    rez += "(+), ";
+                _outStream.WriteLine("THE WINNER IS " + this._nameFighter1);
             }
-            return rez += " scoring " + score;
+            else if (lifePointsFighter2 > lifePointsFighter1)
+            {
+                _outStream.WriteLine("THE WINNER IS " + this._nameFighter2);
+            }
+            else
+            {
+                _outStream.WriteLine("IT'S A DRAW!!!");
+            }
         }
 
-        private static string DescribeDefences(Move move)
+        private static string DescribeAttacks(IFighterMove fighterMove, IFighterMove counterMove, int score)
         {
-            if (move.Defences.Count <= 0)
-                return "  and was NOT defending at all.";
+            if (fighterMove.AttackedAreas.Count <= 0)
+            {
+                return " did NOT attack at all ";
+            }
 
-            string rez = " while defending ";
-            foreach (Area defence in move.Defences)
-                rez += defence + ", ";
+            var sb = new StringBuilder(" attacked ");
 
-            return rez;
+            foreach (var attack in fighterMove.AttackedAreas)
+            {
+                sb.Append(attack);
+                sb.Append(counterMove.BlockedAreas.Contains(attack) ? "(-), " : "(+), ");
+            }
+
+            sb.Append(" scoring " + score);
+            return sb.ToString();
         }
 
+        private static string DescribeBlocks(IFighterMove fighterMove)
+        {
+            if (fighterMove.BlockedAreas.Count <= 0)
+            {
+                return "  and was NOT defending at all.";
+            }
+
+            var sb = new StringBuilder(" while defending ");
+
+            foreach (var defence in fighterMove.BlockedAreas)
+            {
+                sb.Append(defence + ", ");
+            }
+
+            return sb.ToString();
+        }
+
+        private void DescribeMove(string fighterName, IFighterMove fighterMove, int score, IFighterMove counterMove)
+        {
+            _outStream.WriteLine(fighterName + DescribeAttacks(fighterMove, counterMove, score) + DescribeBlocks(fighterMove));
+        }
     }
 }
