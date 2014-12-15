@@ -94,24 +94,20 @@
             {
                 _fighter2 = new Boxer();
             }
-
-            if ("kickboxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            else if ("kickboxer".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
                 _fighter2 = new Kickboxer();
             }
-
-            if ("human".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            else if ("human".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
                 _fighter2 = new Human();
             }
-
-            if ("remote".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
+            else if ("remote".Equals(args[1], StringComparison.InvariantCultureIgnoreCase))
             {
                 _fighter2 = _fighter1 = new RemoteFighterDecorator(fighter, args);
                 _nameFighter2 = "Opponent bot";
             }
-
-            if (_fighter2 == null)
+            else
             {
                 throw new NotSupportedException("unrecognized built-in bot: " + args[1]);
             }
