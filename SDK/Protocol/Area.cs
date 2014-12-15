@@ -1,6 +1,6 @@
-﻿namespace CodeFights.model
+﻿namespace CodeFights.SDK.Protocol
 {
-    internal enum Area
+    public enum Area
     {
         Nose = 10, 
 
