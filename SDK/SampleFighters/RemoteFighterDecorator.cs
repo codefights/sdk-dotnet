@@ -71,8 +71,9 @@
 
         private void StartServer()
         {
-            Console.WriteLine("Provoking a fight at {0}:{1}", IPAddress.Loopback, _port);
-            var tcpListener = new TcpListener(IPAddress.Loopback, _port);
+			var addr = IPAddress.Any;
+            Console.WriteLine("Provoking a fight at {0}:{1}", addr, _port);
+			var tcpListener = new TcpListener(addr, _port);
 
             try
             {
