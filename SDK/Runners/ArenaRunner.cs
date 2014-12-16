@@ -22,10 +22,13 @@
 
         private ArenaCommentator _arenaCommentator;
 
-        public ArenaRunner(string[] args, TextWriter outStream)
+        private int _roundLimit;
+
+        public ArenaRunner(string[] args, TextWriter outStream, int roundLimit = 100)
         {
             _args = args;
             _outStream = outStream;
+            _roundLimit = roundLimit;
         }
 
         public void Run(IFighter fighter)
@@ -53,7 +56,7 @@
             int lifePointsFighter1 = GameScoringRules.LifePointsPerFight;
             int lifePointsFighter2 = GameScoringRules.LifePointsPerFight;
 
-            while (lifePointsFighter1 > 0 && lifePointsFighter2 > 0)
+            while (_roundLimit > 0 && lifePointsFighter1 > 0 && lifePointsFighter2 > 0)
             {
                 var moveFighter1 = _fighter1.MakeNextMove(lastMoveFighter2, lastScoreFighter1, lastScoreFighter2);
 
@@ -79,6 +82,8 @@
 
                 lastMoveFighter1 = moveFighter1;
                 lastMoveFighter2 = moveFighter2;
+
+                _roundLimit--;
             }
 
             _arenaCommentator.GameOver(lifePointsFighter1, lifePointsFighter2);
