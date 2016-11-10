@@ -64,7 +64,7 @@ namespace CodeFights.boilerplate
             string rez = " attacked ";
             foreach (Area attack in move.Attacks)
             {
-                rez += attack;
+                rez += attack.ToString().ToUpper();
                 if (counterMove.Defences.Contains(attack))
                     rez += "(-), ";
                 else
@@ -80,7 +80,7 @@ namespace CodeFights.boilerplate
 
             string rez = " while defending ";
             foreach (Area defence in move.Defences)
-                rez += defence + ", ";
+                rez += defence.ToString().ToUpper() + ", ";
 
             return rez;
         }

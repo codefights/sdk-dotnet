@@ -33,8 +33,8 @@ namespace CodeFights.boilerplate
 
 	    private void PrintInstructions() 
         {
-		    consoleOut.WriteLine("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)eggs");
-		    consoleOut.WriteLine("  (for example, BN BJ AN)");
+		    consoleOut.WriteLine("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)egs");
+		    consoleOut.WriteLine("  (for example, BN BB AN)");
 		    consoleOut.Write(": ");
 	    }
 	
