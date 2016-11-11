@@ -33,9 +33,7 @@ namespace CodeFights.boilerplate
 
 	    private void PrintInstructions() 
         {
-		    consoleOut.WriteLine("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)egs");
-		    consoleOut.WriteLine("  (for example, BN BB AN)");
-		    consoleOut.Write(": ");
+		    consoleOut.Write("Make your move by (A)ttacking and (B)locking (N)ose, (J)aw, (B)elly, (G)roin, (L)egs (for example, BN BB AN): ");
 	    }
 	
 	    private Move ParseInput(string input) 
