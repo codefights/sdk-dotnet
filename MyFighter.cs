@@ -10,7 +10,10 @@ namespace CodeFights
     {
         public Move MakeNextMove(Move opponentsLastMove, int myLastScore, int opponentsLastScore)
         {
-            return new Move().AddAttack(Area.Nose).SetComment("your impl goes here");
+			if (opponentsLastMove == null) 
+				return new Move().AddAttack(Area.Nose);
+			
+			return opponentsLastMove;
         }
     }
 }
